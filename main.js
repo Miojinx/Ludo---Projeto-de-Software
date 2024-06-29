@@ -1,3 +1,3 @@
-import { Ludo } from './ludo/Ludo.js';
+import { Controller } from './ludo/Controller.js';
 
-const ludo = new Ludo();
+const ludo = new Controller();

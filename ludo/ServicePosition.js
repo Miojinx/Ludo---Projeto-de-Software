@@ -1,6 +1,6 @@
 import { COORDINATES_MAP, STEP_LENGTH } from './constants.js';
 
-export class UI {
+export class ServicePosition {
 
     static setPiecePosition(piece, newPosition) {
         const [x, y] = COORDINATES_MAP[newPosition];

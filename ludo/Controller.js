@@ -1,5 +1,5 @@
 import { BASE_POSITIONS, HOME_ENTRANCE, HOME_POSITIONS, PLAYERS, SAFE_POSITIONS, START_POSITIONS, STATE, TURNING_POINTS } from './constants.js';
-import { UI } from './UI.js';
+import { ServicePosition } from './ServicePosition.js';
 import { Jogador } from './Jogador.js';
 import { Dado } from './Dado.js';
 
@@ -7,7 +7,7 @@ let dado
 let jogador1
 let jogador2
 
-export class Ludo {
+export class Controller {
     currentPositions = {
         P1: [],
         P2: []
@@ -74,7 +74,7 @@ export class Ludo {
 
         playerBasesContainer.appendChild(jogador1.getBaseElement());
         playerBasesContainer.appendChild(jogador2.getBaseElement());
-        row.appendChild(dado.getElement())
+        row.insertBefore(dado.getElement(), row.firstChild);
       }
 
     constructor() {
@@ -176,7 +176,7 @@ export class Ludo {
             pieceN = jogador2.getPiecesElements()[piece]
         }
         this.currentPositions[player][piece] = newPosition;
-        UI.setPiecePosition(pieceN, newPosition);
+        ServicePosition.setPiecePosition(pieceN, newPosition);
     }
 
     movePiece(player, piece, moveBy) {
