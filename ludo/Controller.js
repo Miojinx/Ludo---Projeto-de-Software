@@ -6,6 +6,8 @@ import { Dado } from './Dado.js';
 let dado
 let jogador1
 let jogador2
+let modePc = false;
+let modePcDiceCan = false
 
 export class Controller {
     currentPositions = {
@@ -51,43 +53,40 @@ export class Controller {
         const playerPiecesContainer = document.querySelector('.player-pieces');
         const playerBasesContainer = document.querySelector('.player-bases');
         const row = document.querySelector('.row');
-        if (!playerPiecesContainer) {
-          return;
-        }
-        if (!playerBasesContainer) {
+        if (!playerPiecesContainer || !playerBasesContainer) {
             return;
         }
-    
+
         jogador1 = new Jogador(1, 4, (event) => this.onPieceClick(event));
         jogador2 = new Jogador(2, 4, (event) => this.onPieceClick(event));
         dado = new Dado((value) => this.onDiceClick(value));
-    
+
         jogador1.getPiecesElements().forEach(element => {
-          playerPiecesContainer.appendChild(element);
+            playerPiecesContainer.appendChild(element);
         });
-    
+
         jogador2.getPiecesElements().forEach(element => {
-          playerPiecesContainer.appendChild(element);
+            playerPiecesContainer.appendChild(element);
         });
 
         playerBasesContainer.appendChild(jogador1.getBaseElement());
         playerBasesContainer.appendChild(jogador2.getBaseElement());
         row.insertBefore(dado.getElement(), row.firstChild);
-      }
+    }
 
     constructor() {
         console.log('Hello World! Lets play Ludo!');
         this.componentDidMount();
         this.listenResetClick();
+        this.listenModeClick();
         this.resetGame();
     }
-    
+
     onPieceClick(event) {
         const target = event.target;
         if (!target.classList.contains('player-piece') || !target.classList.contains('highlight')) {
             return;
         }
-        console.log('piece clicked');
         const player = target.getAttribute('player-id');
         const piece = target.getAttribute('piece');
         this.handlePieceClick(player, piece);
@@ -97,20 +96,42 @@ export class Controller {
         this.diceValue = value;
         this.state = STATE.DICE_ROLLED;
         this.checkForEligiblePieces();
+        console.log("P1: ", value)
+    }
+
+    onDiceMode(){
+        const randomValue = Math.ceil(Math.random() * 6);
+        if (randomValue == 6) {
+            this.diceValue = 6;
+            modePcDiceCan = true;
+        } else {
+            this.diceValue = randomValue; 
+            modePcDiceCan = false;
+        }
+        console.log("PC: ", this.diceValue)
+        this.state = STATE.DICE_ROLLED;
+        let result = this.checkForEligiblePieces(); 
+        return result;
     }
 
     checkForEligiblePieces() {
+        let result = false;
         const player = PLAYERS[this.turn];
         const eligiblePieces = this.findEligiblePieces(player);
         if (eligiblePieces.length) {
-            if(player == "P1") {
+            result = true
+            if (player === "P1") {
                 jogador1.highlightPieces(eligiblePieces);
-            }else{
+            } else {
                 jogador2.highlightPieces(eligiblePieces);
+                if (modePc && player === "P2") {
+                    this.autoPlay(eligiblePieces);
+                }
             }
         } else {
             this.incrementTurn();
         }
+        return result
     }
 
     incrementTurn() {
@@ -135,11 +156,18 @@ export class Controller {
     }
 
     listenResetClick() {
-        document.querySelector('button#reset-btn').addEventListener('click', this.resetGame.bind(this))
+        document.querySelector('button#reset-btn').addEventListener('click', this.resetGame.bind(this));
+    }
+
+    listenModeClick() {
+        document.querySelector('button#mode-btn').addEventListener('click', () => {
+            modePc = !modePc;
+            document.querySelector('button#mode-btn').textContent = modePc ? 'Jogar VS Humano' : 'Jogar VS Pc';
+            this.resetGame()
+        });
     }
 
     resetGame() {
-        console.log('reset game');
         this.currentPositions = structuredClone(BASE_POSITIONS);
 
         PLAYERS.forEach(player => {
@@ -153,7 +181,6 @@ export class Controller {
     }
 
     handlePieceClick(player, piece) {
-        console.log(player, piece);
         const currentPosition = this.currentPositions[player][piece];
         if (BASE_POSITIONS[player].includes(currentPosition)) {
             this.setPiecePosition(player, piece, START_POSITIONS[player]);
@@ -166,11 +193,11 @@ export class Controller {
     }
 
     setPiecePosition(player, piece, newPosition) {
-        let pieceN
-        if(player == "P1"){
-            pieceN = jogador1.getPiecesElements()[piece]
-        }else{
-            pieceN = jogador2.getPiecesElements()[piece]
+        let pieceN;
+        if (player === "P1") {
+            pieceN = jogador1.getPiecesElements()[piece];
+        } else {
+            pieceN = jogador2.getPiecesElements()[piece];
         }
         this.currentPositions[player][piece] = newPosition;
         ServicePosition.setPiecePosition(pieceN, newPosition);
@@ -198,7 +225,7 @@ export class Controller {
     }
 
     checkForKill(player, piece) {
-        const currentPosition = this.currentPositions[player][piece];
+        const currentPosition = this.currentPositions[player][piece]; 
         const opponent = player === 'P1' ? 'P2' : 'P1';
         let kill = false;
         [0, 1, 2, 3].forEach(piece => {
@@ -230,21 +257,39 @@ export class Controller {
     }
 
     changeTurn(index) {
-        if(index < 0 || index >= PLAYERS.length) {
+        if (index < 0 || index >= PLAYERS.length) {
             console.error('index out of bound!');
             return;
         }
-        
+
         const player = PLAYERS[index];
 
         document.querySelector('.active-player span').innerText = player;
 
-        if(player == "P1"){
-            jogador1.highlightBase()
-            jogador2.unhighlightBase()
-        }else{
-            jogador2.highlightBase()
-            jogador1.unhighlightBase()
+        if (player === "P1") {
+            jogador1.highlightBase();
+            jogador2.unhighlightBase();
+        } else {
+            jogador2.highlightBase();
+            jogador1.unhighlightBase();
+            if (modePc) {
+                setTimeout(() => this.onDiceMode(), 1000);
+            }
+        }
+    }
+
+    autoPlay(eligiblePieces) {
+        if (eligiblePieces.length === 0) {
+            this.incrementTurn();
+            return;
+        }
+    
+        const randomIndex = Math.floor(Math.random() * eligiblePieces.length);
+        const pieceToMove = eligiblePieces[randomIndex];
+        this.handlePieceClick('P2', pieceToMove);
+        if(modePcDiceCan){
+            setTimeout(() => this.onDiceMode(), 1000);
         }
     }
 }
+
