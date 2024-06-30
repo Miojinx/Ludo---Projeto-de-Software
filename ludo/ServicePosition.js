@@ -1,4 +1,4 @@
-import { COORDINATES_MAP, STEP_LENGTH } from './constants.js';
+import { COORDINATES_MAP, STEP_LENGTH } from './Constants.js';
 
 export class ServicePosition {
 

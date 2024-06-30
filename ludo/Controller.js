@@ -1,4 +1,4 @@
-import { BASE_POSITIONS, HOME_ENTRANCE, HOME_POSITIONS, PLAYERS, SAFE_POSITIONS, START_POSITIONS, STATE, TURNING_POINTS } from './constants.js';
+import { BASE_POSITIONS, HOME_ENTRANCE, HOME_POSITIONS, PLAYERS, SAFE_POSITIONS, START_POSITIONS, STATE, TURNING_POINTS } from './Constants.js';
 import { ServicePosition } from './ServicePosition.js';
 import { Jogador } from './Jogador.js';
 import { Dado } from './Dado.js';
@@ -52,11 +52,9 @@ export class Controller {
         const playerBasesContainer = document.querySelector('.player-bases');
         const row = document.querySelector('.row');
         if (!playerPiecesContainer) {
-          console.error("Element with class 'player-pieces' not found in the DOM.");
           return;
         }
         if (!playerBasesContainer) {
-            console.error("Element with class 'player-bases' not found in the DOM.");
             return;
         }
     
@@ -103,8 +101,7 @@ export class Controller {
 
     checkForEligiblePieces() {
         const player = PLAYERS[this.turn];
-        const eligiblePieces = this.getEligiblePieces(player);
-        console.log("elegibles",eligiblePieces)
+        const eligiblePieces = this.findEligiblePieces(player);
         if (eligiblePieces.length) {
             if(player == "P1") {
                 jogador1.highlightPieces(eligiblePieces);
@@ -121,7 +118,7 @@ export class Controller {
         this.state = STATE.DICE_NOT_ROLLED;
     }
 
-    getEligiblePieces(player) {
+    findEligiblePieces(player) {
         return [0, 1, 2, 3].filter(piece => {
             const currentPosition = this.currentPositions[player][piece];
             if (currentPosition === HOME_POSITIONS[player]) {
