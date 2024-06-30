@@ -1,4 +1,4 @@
-import { BASE_POSITIONS, HOME_ENTRANCE, HOME_POSITIONS, PLAYERS, SAFE_POSITIONS, START_POSITIONS, STATE, TURNING_POINTS } from './Constants.js';
+import { BASE_POSITIONS, HOME_ENTRANCE, HOME_POSITIONS, PLAYERS, SAFE_POSITIONS, START_POSITIONS, STATE, TURNING_POINTS } from './constants.js';
 import { ServicePosition } from './ServicePosition.js';
 import { Jogador } from './Jogador.js';
 import { Dado } from './Dado.js';
