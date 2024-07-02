@@ -22,7 +22,13 @@ export class Dado {
     }
 
     rollDice() {
-        this.diceValue = Math.ceil(Math.random() * 6); 
+        const randomValue = Math.ceil(Math.random() * 4);
+        if (randomValue == 1) {
+            this.diceValue = 6;
+        } else {
+            this.diceValue = Math.ceil(Math.random() * 5); 
+        }
+        console.log(`Dado rolou: ${this.diceValue}`);
     }
 
     getDiceValue() {

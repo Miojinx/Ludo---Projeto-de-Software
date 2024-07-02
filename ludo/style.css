@@ -11,7 +11,7 @@
 
     height: 450px;
     width: 100%;
-    background-image: url('./ludo-bg.jpg');
+    background-image: url('./Tabuleiro.png');
     background-size: contain;
     position: relative;
 }

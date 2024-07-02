@@ -100,12 +100,12 @@ export class Controller {
     }
 
     onDiceMode(){
-        const randomValue = Math.ceil(Math.random() * 6);
-        if (randomValue == 6) {
+        const randomValue = Math.ceil(Math.random() * 3);
+        if (randomValue == 1) {
             this.diceValue = 6;
             modePcDiceCan = true;
         } else {
-            this.diceValue = randomValue; 
+            this.diceValue = Math.ceil(Math.random() * 5); 
             modePcDiceCan = false;
         }
         console.log("PC: ", this.diceValue)
